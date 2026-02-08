@@ -106,16 +106,14 @@ public class TreasuryListener extends EconomyAdapter {
     public void onServerLoad(ServerLoadEvent event) {
         if (event.getType() == ServerLoadEvent.LoadType.STARTUP) {
             if (treasury == null) {
-                ChestShop.getBukkitLogger().log(Level.SEVERE, "Treasury plugin loaded but no TreasuryApi service found!");
-                Bukkit.getPluginManager().disablePlugin(ChestShop.getPlugin());
+                ChestShop.getBukkitLogger().log(Level.SEVERE, "Treasury plugin loaded but no TreasuryApi service found! Economy operations will fail.");
             }
         }
     }
 
     private boolean checkSetup() {
         if (treasury == null) {
-            ChestShop.getBukkitLogger().log(Level.SEVERE, "Treasury API is not available!");
-            Bukkit.getPluginManager().disablePlugin(ChestShop.getPlugin());
+            ChestShop.getBukkitLogger().log(Level.SEVERE, "Treasury API is not available! Economy operation skipped.");
             return false;
         }
         return true;
@@ -281,21 +279,30 @@ public class TreasuryListener extends EconomyAdapter {
             UUID senderUuid = event.getSender();
             UUID receiverUuid = event.getReceiver();
 
+            ChestShop.logDebug("Treasury transfer: sender=" + senderUuid + " receiver=" + receiverUuid
+                    + " direction=" + event.getDirection() + " treasuryAccountId=" + event.getTreasuryAccountId()
+                    + " amount=" + event.getAmountSent());
+
             // Resolve sender account
             int senderAccountId;
             if (event.getDirection() != CurrencyTransferEvent.Direction.PARTNER
                     && event.getTreasuryAccountId() >= 0) {
                 // Sender is the shop (business account) in a SELL transaction
                 senderAccountId = event.getTreasuryAccountId();
+                ChestShop.logDebug("Treasury: sender is business account #" + senderAccountId);
             } else if (NameManager.isAdminShop(senderUuid)) {
                 // Admin shop sender - skip subtraction
                 senderAccountId = -1;
+                ChestShop.logDebug("Treasury: sender is admin shop, skipping");
             } else {
                 Account senderAccount = treasury.resolveOrCreatePersonal(senderUuid);
                 if (senderAccount == null) {
+                    ChestShop.getBukkitLogger().log(Level.WARNING,
+                            "Treasury: Could not resolve personal account for sender " + senderUuid);
                     return;
                 }
                 senderAccountId = senderAccount.getAccountId();
+                ChestShop.logDebug("Treasury: sender resolved to personal account #" + senderAccountId);
             }
 
             // Resolve receiver account
@@ -304,19 +311,25 @@ public class TreasuryListener extends EconomyAdapter {
                     && event.getTreasuryAccountId() >= 0) {
                 // Receiver is the shop (business account) in a BUY transaction
                 receiverAccountId = event.getTreasuryAccountId();
+                ChestShop.logDebug("Treasury: receiver is business account #" + receiverAccountId);
             } else if (NameManager.isAdminShop(receiverUuid)) {
                 // Admin shop receiver - skip addition
                 receiverAccountId = -1;
+                ChestShop.logDebug("Treasury: receiver is admin shop, skipping");
             } else {
                 Account receiverAccount = treasury.resolveOrCreatePersonal(receiverUuid);
                 if (receiverAccount == null) {
+                    ChestShop.getBukkitLogger().log(Level.WARNING,
+                            "Treasury: Could not resolve personal account for receiver " + receiverUuid);
                     return;
                 }
                 receiverAccountId = receiverAccount.getAccountId();
+                ChestShop.logDebug("Treasury: receiver resolved to personal account #" + receiverAccountId);
             }
 
             // If both sides are admin shops (shouldn't happen), mark as handled
             if (senderAccountId < 0 && receiverAccountId < 0) {
+                ChestShop.logDebug("Treasury: both sides are admin shops, marking handled");
                 event.setHandled(true);
                 return;
             }
@@ -324,6 +337,7 @@ public class TreasuryListener extends EconomyAdapter {
             // If sender is admin shop, only do deposit to receiver
             if (senderAccountId < 0) {
                 // Admin shop - just mark handled, no actual economy movement needed
+                ChestShop.logDebug("Treasury: sender is admin shop, marking handled (no transfer needed)");
                 event.setHandled(true);
                 return;
             }
@@ -331,6 +345,7 @@ public class TreasuryListener extends EconomyAdapter {
             // If receiver is admin shop, only do withdrawal from sender
             if (receiverAccountId < 0) {
                 // Admin shop - just mark handled, no actual economy movement needed
+                ChestShop.logDebug("Treasury: receiver is admin shop, marking handled (no transfer needed)");
                 event.setHandled(true);
                 return;
             }
@@ -356,8 +371,13 @@ public class TreasuryListener extends EconomyAdapter {
                     dedup
             );
 
+            ChestShop.logDebug("Treasury: executing transfer from account #" + senderAccountId
+                    + " to account #" + receiverAccountId + " amount=" + event.getAmountSent());
+
             treasury.transfer(req);
             event.setHandled(true);
+
+            ChestShop.logDebug("Treasury: transfer completed successfully");
 
         } catch (SecurityException e) {
             ChestShop.getBukkitLogger().log(Level.WARNING,

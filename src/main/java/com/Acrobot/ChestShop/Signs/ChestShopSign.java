@@ -10,9 +10,11 @@ import com.Acrobot.ChestShop.Containers.AdminInventory;
 import com.Acrobot.ChestShop.Database.Account;
 import com.Acrobot.ChestShop.Events.AccountQueryEvent;
 import com.Acrobot.ChestShop.Events.SignValidationEvent;
+import com.Acrobot.ChestShop.Listeners.Economy.Plugins.TreasuryListener;
 import com.Acrobot.ChestShop.Permission;
 import com.Acrobot.ChestShop.UUIDs.NameManager;
 import com.Acrobot.ChestShop.Utils.uBlock;
+import net.democracycraft.treasury.api.TreasuryApi;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -219,6 +221,11 @@ public class ChestShopSign {
         String name = getOwner(sign);
         if (name == null || name.isEmpty()) return true;
 
+        // For business account signs, check Treasury access
+        if (isBusinessAccount(name)) {
+            return hasBusinessAccountAccess(player, name);
+        }
+
         return NameManager.canUseName(player, base, name);
     }
 
@@ -228,6 +235,11 @@ public class ChestShopSign {
         String name = getOwner(sign);
         if (name == null || name.isEmpty()) return false;
 
+        // For business account signs, check Treasury access
+        if (isBusinessAccount(name)) {
+            return hasBusinessAccountAccess(player, name);
+        }
+
         AccountQueryEvent accountQueryEvent = new AccountQueryEvent(name);
         Bukkit.getPluginManager().callEvent(accountQueryEvent);
         Account account = accountQueryEvent.getAccount();
@@ -235,6 +247,30 @@ public class ChestShopSign {
             return player.getName().equalsIgnoreCase(name);
         }
         return account.getUuid().equals(player.getUniqueId());
+    }
+
+    /**
+     * Check if a player has access to a business account specified on a sign.
+     * Uses Treasury API's canAccessAccount to verify membership/ownership.
+     *
+     * @param player The player to check
+     * @param ownerString The owner string from the sign (e.g. "B:42")
+     * @return true if the player can access the business account
+     */
+    public static boolean hasBusinessAccountAccess(Player player, String ownerString) {
+        TreasuryApi treasury = TreasuryListener.getTreasuryApi();
+        if (treasury == null) {
+            return false;
+        }
+        try {
+            int accountId = getBusinessAccountId(ownerString);
+            return treasury.canAccessAccount(player.getUniqueId(), accountId);
+        } catch (NumberFormatException e) {
+            return false;
+        } catch (Exception e) {
+            ChestShop.getBukkitLogger().warning("Error checking Treasury business account access for " + player.getName() + " on " + ownerString + ": " + e.getMessage());
+            return false;
+        }
     }
 
     /**

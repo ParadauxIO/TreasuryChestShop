@@ -42,11 +42,21 @@ public class SignCreate implements Listener {
             return;
         }
 
-        if (ChestShopSign.isValid(event.getLines()) && !NameManager.canUseName(event.getPlayer(), OTHER_NAME_DESTROY, ChestShopSign.getOwner(event.getLines()))) {
-            event.setCancelled(true);
-            sign.update();
-            ChestShop.logDebug("Shop sign creation at " + sign.getLocation() + " by " + event.getPlayer().getName() + " was cancelled as they weren't able to create a shop for the account '" + ChestShopSign.getOwner(event.getLines()) + "'");
-            return;
+        if (ChestShopSign.isValid(event.getLines())) {
+            String newOwner = ChestShopSign.getOwner(event.getLines());
+            boolean canDestroy;
+            if (ChestShopSign.isBusinessAccount(newOwner)) {
+                // For business account signs, use ChestShopSign.canAccess which handles Treasury
+                canDestroy = ChestShopSign.hasPermission(event.getPlayer(), OTHER_NAME_DESTROY, sign);
+            } else {
+                canDestroy = NameManager.canUseName(event.getPlayer(), OTHER_NAME_DESTROY, newOwner);
+            }
+            if (!canDestroy) {
+                event.setCancelled(true);
+                sign.update();
+                ChestShop.logDebug("Shop sign creation at " + sign.getLocation() + " by " + event.getPlayer().getName() + " was cancelled as they weren't able to create a shop for the account '" + newOwner + "'");
+                return;
+            }
         }
 
         String[] lines = StringUtil.stripColourCodes(event.getLines());

@@ -21,8 +21,8 @@
         <build.number>${buildNumber}</build.number>
         <user.name>${buildType}</user.name>
         <bukkit.plugin.version>${project.version} ${buildDescription}</bukkit.plugin.version>
-        <maven.compiler.target>8</maven.compiler.target>
-        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
     </properties>
 
     <profiles>
@@ -459,8 +459,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.14.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
             <plugin>

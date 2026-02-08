@@ -164,7 +164,14 @@ public class SignBreak implements Listener {
     }
 
     private static boolean canDestroyShop(Player player, String name) {
-        return player != null && NameManager.canUseName(player, OTHER_NAME_DESTROY, name);
+        if (player == null) {
+            return false;
+        }
+        // For business account signs, check Treasury access
+        if (ChestShopSign.isBusinessAccount(name)) {
+            return ChestShopSign.hasBusinessAccountAccess(player, name);
+        }
+        return NameManager.canUseName(player, OTHER_NAME_DESTROY, name);
     }
 
     public static void sendShopDestroyedEvent(Sign sign, Player player) {

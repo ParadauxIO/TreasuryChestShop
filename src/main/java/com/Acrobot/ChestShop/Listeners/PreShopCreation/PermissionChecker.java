@@ -28,7 +28,10 @@ public class PermissionChecker implements Listener {
     public static void onPreShopCreation(PreShopCreationEvent event) {
         Player player = event.getPlayer();
 
-        if (event.getOwnerAccount() != null
+        // For business account shops, access was already verified via Treasury in NameChecker
+        if (event.getTreasuryAccountId() >= 0) {
+            // Still check item-specific and buy/sell permissions below
+        } else if (event.getOwnerAccount() != null
                 && !NameManager.canUseName(player, OTHER_NAME_CREATE, event.getOwnerAccount().getShortName())) {
             event.setSignLine(NAME_LINE, "");
             event.setOutcome(NO_PERMISSION);
