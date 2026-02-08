@@ -12,7 +12,14 @@
       "Bash(ls:*)",
       "Bash(JAVA_HOME=\"/c/Users/rian/.jdks/jbr-21.0.10\" /c/ProgramData/chocolatey/lib/maven/apache-maven-3.9.12/bin/mvn compile:*)",
       "Bash(JAVA_HOME=\"/c/Users/rian/.jdks/jbr-21.0.10\" /c/ProgramData/chocolatey/lib/maven/apache-maven-3.9.12/bin/mvn package:*)",
-      "Bash(JAVA_HOME=\"/c/Users/rian/.jdks/jbr-21.0.10\" /c/Users/rian/.jdks/jbr-21.0.10/bin/jar:*)"
+      "Bash(JAVA_HOME=\"/c/Users/rian/.jdks/jbr-21.0.10\" /c/Users/rian/.jdks/jbr-21.0.10/bin/jar:*)",
+      "Bash(find:*)",
+      "Bash(./gradlew publishToMavenLocal:*)",
+      "Bash(mvn clean install:*)",
+      "Bash(cmd.exe /c \"mvn --version\")",
+      "Bash(cmd.exe /c \"set PATH=C:\\\\ProgramData\\\\chocolatey\\\\lib\\\\maven\\\\apache-maven-3.9.12\\\\bin;%PATH% && mvn clean install -DskipTests\")",
+      "Bash(export JAVA_HOME=\"/c/Users/rian/.jdks/jbr-21.0.10\")",
+      "Bash(/c/ProgramData/chocolatey/lib/maven/apache-maven-3.9.12/bin/mvn.cmd:*)"
     ]
   }
 }

@@ -41,6 +41,8 @@ public class PreTransactionEvent extends Event implements Cancellable {
 
     private TransactionOutcome transactionOutcome = TRANSACTION_SUCCESFUL;
 
+    private int treasuryAccountId = -1;
+
     public PreTransactionEvent(Inventory ownerInventory, Inventory clientInventory, ItemStack[] items, BigDecimal exactPrice, Player client, Account ownerAccount, Sign sign, TransactionType type) {
         this.ownerInventory = ownerInventory;
         this.clientInventory = (clientInventory == null ? client.getInventory() : clientInventory);
@@ -218,6 +220,25 @@ public class PreTransactionEvent extends Event implements Cancellable {
      */
     public void setCancelled(TransactionOutcome reason) {
         transactionOutcome = reason;
+    }
+
+    /**
+     * Get the Treasury account ID for the shop side of this transaction.
+     * A value of -1 means no business account (use personal account).
+     *
+     * @return The Treasury account ID, or -1 if not set
+     */
+    public int getTreasuryAccountId() {
+        return treasuryAccountId;
+    }
+
+    /**
+     * Set the Treasury account ID for the shop side of this transaction.
+     *
+     * @param treasuryAccountId The Treasury account ID, or -1 to unset
+     */
+    public void setTreasuryAccountId(int treasuryAccountId) {
+        this.treasuryAccountId = treasuryAccountId;
     }
 
     public HandlerList getHandlers() {

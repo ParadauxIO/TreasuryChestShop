@@ -23,6 +23,7 @@ public class PreShopCreationEvent extends Event implements Cancellable {
     private CreationOutcome outcome = CreationOutcome.SHOP_CREATED_SUCCESSFULLY;
     private Sign sign;
     private String[] signLines;
+    private int treasuryAccountId = -1;
 
     public PreShopCreationEvent(Player creator, Sign sign, String[] signLines) {
         this.creator = creator;
@@ -165,6 +166,25 @@ public class PreShopCreationEvent extends Event implements Cancellable {
         this.ownerAccount = ownerAccount;
     }
 
+    /**
+     * Get the Treasury account ID for this shop (if a business account).
+     * A value of -1 means no business account.
+     *
+     * @return The Treasury account ID, or -1 if not set
+     */
+    public int getTreasuryAccountId() {
+        return treasuryAccountId;
+    }
+
+    /**
+     * Set the Treasury account ID for this shop (if a business account).
+     *
+     * @param treasuryAccountId The Treasury account ID, or -1 to unset
+     */
+    public void setTreasuryAccountId(int treasuryAccountId) {
+        this.treasuryAccountId = treasuryAccountId;
+    }
+
     public HandlerList getHandlers() {
         return handlers;
     }
@@ -198,6 +218,9 @@ public class PreShopCreationEvent extends Event implements Cancellable {
         NO_PERMISSION_FOR_CHEST,
 
         NOT_ENOUGH_MONEY,
+
+        BUSINESS_ACCOUNT_NOT_FOUND,
+        NO_TREASURY_ACCOUNT_ACCESS,
 
         /**
          * For plugin use

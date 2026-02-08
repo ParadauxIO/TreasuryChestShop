@@ -110,6 +110,9 @@ public class Messages {
     public static Message NOT_ENOUGH_PROTECTIONS;
     public static Message NO_SHOP_FOUND;
 
+    public static Message BUSINESS_ACCOUNT_NOT_FOUND;
+    public static Message BUSINESS_ACCOUNT_ACCESS_DENIED;
+
     public static Message CANNOT_CREATE_SHOP_HERE;
 
     public static Message TOGGLE_MESSAGES_OFF;

@@ -50,6 +50,12 @@ public class ErrorMessageSender implements Listener {
             case NOT_ENOUGH_MONEY:
                 message = Messages.NOT_ENOUGH_MONEY;
                 break;
+            case BUSINESS_ACCOUNT_NOT_FOUND:
+                message = Messages.BUSINESS_ACCOUNT_NOT_FOUND;
+                break;
+            case NO_TREASURY_ACCOUNT_ACCESS:
+                message = Messages.BUSINESS_ACCOUNT_ACCESS_DENIED;
+                break;
             case ITEM_AUTOFILL:
                 message = Messages.CLICK_TO_AUTOFILL_ITEM;
                 break;

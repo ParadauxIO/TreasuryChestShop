@@ -35,6 +35,8 @@ public class TransactionEvent extends Event implements Cancellable {
 
     private boolean cancelled = false;
 
+    private int treasuryAccountId = -1;
+
     public TransactionEvent(PreTransactionEvent event, Sign sign) {
         this.type = event.getTransactionType();
 
@@ -48,6 +50,7 @@ public class TransactionEvent extends Event implements Cancellable {
         this.exactPrice = event.getExactPrice();
 
         this.sign = sign;
+        this.treasuryAccountId = event.getTreasuryAccountId();
     }
 
     public TransactionEvent(TransactionType type, Inventory ownerInventory, Inventory clientInventory, Player client, Account ownerAccount, ItemStack[] stock, BigDecimal exactPrice, Sign sign) {
@@ -149,6 +152,25 @@ public class TransactionEvent extends Event implements Cancellable {
      */
     public Sign getSign() {
         return sign;
+    }
+
+    /**
+     * Get the Treasury account ID for the shop side of this transaction.
+     * A value of -1 means no business account (use personal account).
+     *
+     * @return The Treasury account ID, or -1 if not set
+     */
+    public int getTreasuryAccountId() {
+        return treasuryAccountId;
+    }
+
+    /**
+     * Set the Treasury account ID for the shop side of this transaction.
+     *
+     * @param treasuryAccountId The Treasury account ID, or -1 to unset
+     */
+    public void setTreasuryAccountId(int treasuryAccountId) {
+        this.treasuryAccountId = treasuryAccountId;
     }
 
     public HandlerList getHandlers() {

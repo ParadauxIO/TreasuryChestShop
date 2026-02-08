@@ -27,6 +27,8 @@ public class CurrencyTransferEvent extends EconomicEvent {
 
     private final TransactionEvent transactionEvent;
 
+    private int treasuryAccountId = -1;
+
     public CurrencyTransferEvent(BigDecimal amount, Player initiator, UUID partner, Direction direction) {
         this(amount, amount, initiator, partner, direction);
     }
@@ -209,6 +211,25 @@ public class CurrencyTransferEvent extends EconomicEvent {
      */
     public UUID getReceiver() {
         return direction == Direction.PARTNER ? partner : initiator.getUniqueId();
+    }
+
+    /**
+     * Get the Treasury account ID for the partner/shop side of this transfer.
+     * A value of -1 means no business account is set (use UUID-based personal account resolution).
+     *
+     * @return The Treasury account ID, or -1 if not set
+     */
+    public int getTreasuryAccountId() {
+        return treasuryAccountId;
+    }
+
+    /**
+     * Set the Treasury account ID for the partner/shop side of this transfer.
+     *
+     * @param treasuryAccountId The Treasury account ID, or -1 to unset
+     */
+    public void setTreasuryAccountId(int treasuryAccountId) {
+        this.treasuryAccountId = treasuryAccountId;
     }
 
     public HandlerList getHandlers() {

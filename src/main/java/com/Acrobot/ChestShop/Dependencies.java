@@ -4,6 +4,7 @@ import com.Acrobot.Breeze.Utils.MaterialUtil;
 import com.Acrobot.ChestShop.Configuration.Properties;
 import com.Acrobot.ChestShop.Listeners.Economy.EconomyAdapter;
 import com.Acrobot.ChestShop.Listeners.Economy.Plugins.ReserveListener;
+import com.Acrobot.ChestShop.Listeners.Economy.Plugins.TreasuryListener;
 import com.Acrobot.ChestShop.Listeners.Economy.Plugins.VaultListener;
 import com.Acrobot.ChestShop.Plugins.*;
 import com.google.common.collect.ImmutableMap;
@@ -108,6 +109,14 @@ public class Dependencies implements Listener {
         if(Bukkit.getPluginManager().getPlugin("Vault") != null) {
             plugin = "Vault";
             economy = VaultListener.initializeVault();
+        }
+
+        if(Bukkit.getPluginManager().getPlugin("Treasury") != null) {
+            EconomyAdapter treasuryAdapter = TreasuryListener.initializeTreasury();
+            if (treasuryAdapter != null) {
+                plugin = "Treasury";
+                economy = treasuryAdapter;
+            }
         }
 
         if (economy == null) {

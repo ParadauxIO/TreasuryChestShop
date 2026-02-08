@@ -34,6 +34,8 @@ public enum Permission {
     OTHER_NAME_ACCESS("ChestShop.othername.access"),
     GROUP("ChestShop.group."),
 
+    BUSINESS_ACCOUNT("ChestShop.shop.business"),
+
     NOFEE("ChestShop.nofee"),
     DISCOUNT("ChestShop.discount."),
     NO_BUY_TAX("ChestShop.notax.buy"),

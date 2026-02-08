@@ -22,6 +22,9 @@ public class EconomicModule implements Listener {
                 event.getTransactionType() == BUY ? CurrencyTransferEvent.Direction.PARTNER : CurrencyTransferEvent.Direction.INITIATOR,
                 event
         );
+        if (event.getTreasuryAccountId() >= 0) {
+            currencyTransferEvent.setTreasuryAccountId(event.getTreasuryAccountId());
+        }
         ChestShop.callEvent(currencyTransferEvent);
         if (!currencyTransferEvent.wasHandled()) {
             event.setCancelled(true);

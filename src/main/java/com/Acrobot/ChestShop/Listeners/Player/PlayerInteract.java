@@ -13,11 +13,13 @@ import com.Acrobot.ChestShop.Events.ItemParseEvent;
 import com.Acrobot.ChestShop.Events.PreTransactionEvent;
 import com.Acrobot.ChestShop.Events.ShopInfoEvent;
 import com.Acrobot.ChestShop.Events.TransactionEvent;
+import com.Acrobot.ChestShop.Listeners.Economy.Plugins.TreasuryListener;
 import com.Acrobot.ChestShop.Permission;
 import com.Acrobot.ChestShop.Security;
 import com.Acrobot.ChestShop.Signs.ChestShopSign;
 import com.Acrobot.ChestShop.Utils.ItemUtil;
 import com.Acrobot.ChestShop.Utils.uBlock;
+import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
@@ -187,9 +189,43 @@ public class PlayerInteract implements Listener {
         String prices = ChestShopSign.getPrice(sign);
         String material = ChestShopSign.getItem(sign);
 
-        AccountQueryEvent accountQueryEvent = new AccountQueryEvent(name);
-        Bukkit.getPluginManager().callEvent(accountQueryEvent);
-        Account account = accountQueryEvent.getAccount();
+        int treasuryAccountId = -1;
+        Account account = null;
+
+        // Handle business account format (B:<accountId>)
+        if (ChestShopSign.isBusinessAccount(name)) {
+            net.democracycraft.treasury.api.TreasuryApi treasury = TreasuryListener.getTreasuryApi();
+            if (treasury == null) {
+                Messages.INVALID_SHOP_DETECTED.sendWithPrefix(player);
+                return null;
+            }
+
+            try {
+                int bizAccountId = ChestShopSign.getBusinessAccountId(name);
+                net.democracycraft.treasury.model.economy.Account treasuryAccount = treasury.getAccountById(bizAccountId);
+                if (treasuryAccount == null || treasuryAccount.getOwnerUuid() == null) {
+                    Messages.INVALID_SHOP_DETECTED.sendWithPrefix(player);
+                    return null;
+                }
+
+                // Resolve ChestShop Account from the Treasury account's owner UUID
+                UUID ownerUuid = treasuryAccount.getOwnerUuid();
+                account = com.Acrobot.ChestShop.UUIDs.NameManager.getAccount(ownerUuid);
+                if (account == null) {
+                    account = com.Acrobot.ChestShop.UUIDs.NameManager.getOrCreateAccount(
+                            Bukkit.getOfflinePlayer(ownerUuid));
+                }
+                treasuryAccountId = bizAccountId;
+            } catch (Exception e) {
+                Messages.INVALID_SHOP_DETECTED.sendWithPrefix(player);
+                return null;
+            }
+        } else {
+            AccountQueryEvent accountQueryEvent = new AccountQueryEvent(name);
+            Bukkit.getPluginManager().callEvent(accountQueryEvent);
+            account = accountQueryEvent.getAccount();
+        }
+
         if (account == null) {
             Messages.PLAYER_NOT_FOUND.sendWithPrefix(player);
             return null;
@@ -197,8 +233,8 @@ public class PlayerInteract implements Listener {
 
         boolean adminShop = ChestShopSign.isAdminShop(sign);
 
-        // check if player exists in economy
-        if (!adminShop) {
+        // check if player exists in economy (skip for business accounts - Treasury manages them)
+        if (!adminShop && treasuryAccountId < 0) {
             AccountCheckEvent event = new AccountCheckEvent(account.getUuid(), player.getWorld());
             Bukkit.getPluginManager().callEvent(event);
             if(!event.hasAccount()) {
@@ -267,7 +303,11 @@ public class PlayerInteract implements Listener {
         }
 
         TransactionType transactionType = (action == buy ? BUY : SELL);
-        return new PreTransactionEvent(ownerInventory, player.getInventory(), items, price, player, account, sign, transactionType);
+        PreTransactionEvent pte = new PreTransactionEvent(ownerInventory, player.getInventory(), items, price, player, account, sign, transactionType);
+        if (treasuryAccountId >= 0) {
+            pte.setTreasuryAccountId(treasuryAccountId);
+        }
+        return pte;
     }
 
     private static boolean isAllowedForShift(boolean buyTransaction) {

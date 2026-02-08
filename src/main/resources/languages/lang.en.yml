@@ -109,6 +109,9 @@ INVALID_CLIENT_NAME: "Your username is not a valid Minecraft username!"
 NOT_ENOUGH_PROTECTIONS: "Could not create a protection!"
 NO_SHOP_FOUND: "No shop found."
 
+BUSINESS_ACCOUNT_NOT_FOUND: "Business account not found!"
+BUSINESS_ACCOUNT_ACCESS_DENIED: "You don't have access to that business account!"
+
 CANNOT_CREATE_SHOP_HERE: "You can't create shop here!"
 
 TOGGLE_MESSAGES_OFF: "You will no longer receive messages from your shop(s)."

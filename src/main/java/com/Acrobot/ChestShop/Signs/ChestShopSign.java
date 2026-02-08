@@ -56,12 +56,16 @@ public class ChestShopSign {
             }
     };
     public static final String AUTOFILL_CODE = "?";
+    public static final String BUSINESS_ACCOUNT_PREFIX = "B:";
 
     public static boolean isAdminShop(Inventory ownerInventory) {
         return ownerInventory instanceof AdminInventory;
     }
 
     public static boolean isAdminShop(String owner) {
+        if (owner.startsWith(BUSINESS_ACCOUNT_PREFIX)) {
+            return false;
+        }
         return owner.replace(" ", "").equalsIgnoreCase(Properties.ADMIN_SHOP_NAME.replace(" ", ""));
     }
 
@@ -71,6 +75,63 @@ public class ChestShopSign {
 
     public static boolean isAdminShop(String[] lines) {
         return isAdminShop(getOwner(lines));
+    }
+
+    /**
+     * Check if the sign's name line specifies a Treasury business account (B:accountId format)
+     * @param sign The sign
+     * @return true if this is a business account shop
+     */
+    public static boolean isBusinessAccount(Sign sign) {
+        return isBusinessAccount(sign.getLines());
+    }
+
+    /**
+     * Check if the sign lines specify a Treasury business account (B:accountId format)
+     * @param lines The sign lines
+     * @return true if this is a business account shop
+     */
+    public static boolean isBusinessAccount(String[] lines) {
+        return isBusinessAccount(getOwner(lines));
+    }
+
+    /**
+     * Check if the owner string specifies a Treasury business account (B:accountId format)
+     * @param owner The owner string
+     * @return true if this is a business account shop
+     */
+    public static boolean isBusinessAccount(String owner) {
+        return owner.startsWith(BUSINESS_ACCOUNT_PREFIX);
+    }
+
+    /**
+     * Parse the Treasury account ID from a business account sign
+     * @param sign The sign
+     * @return The Treasury account ID
+     * @throws NumberFormatException if the account ID is not a valid integer
+     */
+    public static int getBusinessAccountId(Sign sign) throws NumberFormatException {
+        return getBusinessAccountId(sign.getLines());
+    }
+
+    /**
+     * Parse the Treasury account ID from business account sign lines
+     * @param lines The sign lines
+     * @return The Treasury account ID
+     * @throws NumberFormatException if the account ID is not a valid integer
+     */
+    public static int getBusinessAccountId(String[] lines) throws NumberFormatException {
+        return getBusinessAccountId(getOwner(lines));
+    }
+
+    /**
+     * Parse the Treasury account ID from a business account owner string
+     * @param owner The owner string (e.g. "B:42")
+     * @return The Treasury account ID
+     * @throws NumberFormatException if the account ID is not a valid integer
+     */
+    public static int getBusinessAccountId(String owner) throws NumberFormatException {
+        return Integer.parseInt(owner.substring(BUSINESS_ACCOUNT_PREFIX.length()));
     }
 
     public static boolean isValid(Sign sign) {
