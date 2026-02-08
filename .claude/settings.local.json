@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn compile:*)",
+      "Bash(cmd.exe /c \"where mvn\")",
+      "Bash(cmd.exe /c \"where mvn.cmd\")",
+      "Bash(export PATH:*)",
+      "Bash(cmd.exe /c \"mvn compile\")",
+      "Bash(cmd.exe /c \"mvn compile 2>&1\")",
+      "Bash(/c/ProgramData/chocolatey/lib/maven/apache-maven-3.9.12/bin/mvn compile)",
+      "Bash(java -version:*)",
+      "Bash(ls:*)",
+      "Bash(JAVA_HOME=\"/c/Users/rian/.jdks/jbr-21.0.10\" /c/ProgramData/chocolatey/lib/maven/apache-maven-3.9.12/bin/mvn compile:*)",
+      "Bash(JAVA_HOME=\"/c/Users/rian/.jdks/jbr-21.0.10\" /c/ProgramData/chocolatey/lib/maven/apache-maven-3.9.12/bin/mvn package:*)",
+      "Bash(JAVA_HOME=\"/c/Users/rian/.jdks/jbr-21.0.10\" /c/Users/rian/.jdks/jbr-21.0.10/bin/jar:*)"
+    ]
+  }
+}
